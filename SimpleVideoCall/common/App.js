@@ -82,3 +82,27 @@ RTCPeerConnection.prototype.getLocalStreams = function () {
     return this._localStreams;
 };
 
+// Patch RTCPeerConnection to release local streams on close
+
+const pc_close = RTCPeerConnection.prototype.close;
+
+RTCPeerConnection.prototype.close = function () {
+  if (!this._localStreams) {
+      this._localStreams = []
+  }
+
+  if (this._localStreams.length > 0) {
+    this._localStreams.forEach((s) => {
+      this.removeStream(s)
+
+      //taken from https://github.com/oney/react-native-webrtc/issues/209#issuecomment-281482869
+      s.getTracks().forEach((t) => {
+        s.removeTrack(t);
+      });
+      s.release();
+
+    });
+
+    pc_close.call(this);
+  }
+};
