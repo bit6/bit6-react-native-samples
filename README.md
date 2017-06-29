@@ -3,9 +3,13 @@ Sample apps for Bit6 video sessions in React Native
 
 
 ## Usage
-- Clone the repository, run `npm install`.  
-- run `npm start`.
+- Clone the repository, 
+- run in terminal
 
+	```
+	npm install
+	react-native link
+	```
 
 ## Run in Android
 
