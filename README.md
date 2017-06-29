@@ -7,14 +7,14 @@ Sample apps for Bit6 video sessions in React Native
 - run `npm start`.
 
 
-##Run in Android
+## Run in Android
 
 1. Open Android Studio.
 2. Import the project at `/android/` folder.
 3. Run the project.
 
 
-##Run in iOS
+## Run in iOS
 
 1. Open `/ios/SimpleVideoCall.xcodeproj` in Xcode.
 2. Set a team for `SimpleVideoCall` and `SimpleVideoCallTests` targets.
