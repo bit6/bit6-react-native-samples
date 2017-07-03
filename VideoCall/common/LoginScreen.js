@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Button } from 'react-native';
+import { View, TextInput, Button, Platform } from 'react-native';
 import { AccessToken, Signal } from 'bit6';
 
 export class LoginScreen extends React.Component {
@@ -11,6 +11,7 @@ export class LoginScreen extends React.Component {
     super(props,context);
 
     this.state = {
+      device: (Platform.OS === 'ios' ? 'ios' : 'and') + Math.floor((Math.random() * 1000) + 1),
       username : '',
       loging : false
     }
@@ -19,14 +20,16 @@ export class LoginScreen extends React.Component {
   render() {
     return (
             <View style={{padding: 10}}>
-            <TextInput style={{height: 40}} placeholder='Enter your username' onChangeText={(username) => this.setState({username})} autoCapitalize='none' value={this.state.username}/>
+            <TextInput style={{height: 40}} placeholder='Enter your username' onChangeText={(username) => this.setState({username})} autoCapitalize='none'/>
             <Button onPress={() => this.generateJWT((jwt) => this.login(jwt))} title='Login' disabled={this.state.loging}/>
             </View>
             )
   }
 
   generateJWT(handler) {
-    if (this.state.username !== '') {
+    const { username, device } = this.state
+
+    if (username !== '') {
       this.setState({loging:true})
       fetch('https://bit6-demo-token-svc.herokuapp.com/token', {
             method: 'POST',
@@ -35,8 +38,8 @@ export class LoginScreen extends React.Component {
             'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                                 identity: this.state.username,
-                                 device: 'web1',
+                                 identity: username,
+                                 device: device,
                                  })
             })
       .then((response) => response.json())
@@ -61,9 +64,9 @@ export class LoginScreen extends React.Component {
     var signalSvc = new Signal(accessToken);
 
     const { navigate } = this.props.navigation;
-    const { username } = this.state;
+    const { username, device } = this.state;
     
-    navigate('Calling', { username, signalSvc })
+    navigate('Messaging', { user: username + '/' + device, signalSvc })
   }
 
 }

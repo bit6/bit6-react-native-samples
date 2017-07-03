@@ -4,7 +4,7 @@ import { Signal } from 'bit6';
 
 export class MessagingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-                                                  title: `Logged as ${navigation.state.params.username}`,
+                                                  title: `Logged as ${navigation.state.params.user}`,
                                                   });
 
   constructor(props,context) {
