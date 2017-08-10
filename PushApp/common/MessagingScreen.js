@@ -78,7 +78,7 @@ export class MessagingScreen extends React.Component {
         sound: 'default',
         badge: 1
       };
-      pushSvc.send( {to: destination, fcm: fcm, apns: apns} );
+      pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
 
       this.setState({message:'' })
     }
