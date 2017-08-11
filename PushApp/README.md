@@ -2,6 +2,8 @@
 
 Sample app for sending/receiving push notifications using Bit6 Push Service in React Native.
 
+##### Note. When running on iOS the user might disable access for the regular push notifications, but the access for voip_notifications is always granted. In this case the demo will continue with support only for VoIP notifications.
+
 ### Usage
 - Clone the repository
 - run in terminal

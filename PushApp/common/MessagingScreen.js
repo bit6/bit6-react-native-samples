@@ -25,7 +25,7 @@ export class MessagingScreen extends React.Component {
     this.state = {
       destination : '',
       message : '',
-      lastMessage : ''
+      lastMessage : '---'
     }
 
     var screen = this
@@ -54,13 +54,24 @@ export class MessagingScreen extends React.Component {
             <View style={{padding: 10}}>
             <TextInput style={{height: 40}} placeholder='Enter destination username' onChangeText={(destination) => this.setState({destination})} autoCapitalize='none'/>
             <TextInput style={{height: 40}} placeholder='Enter message' onChangeText={(message) => this.setState({message})} autoCapitalize='none' value={message}/>
-            <Text>{lastMessage}</Text>
-            <Button onPress={() => this.sendMessage()} title='Send'/>
+
+            <View style={{ flex: 0, flexDirection: 'row' }}>
+                <View style={{width: 150}}>
+                    <Button onPress={() => this.sendMessage(null)} title='Send'/>
+                </View>
+                <View style={{width: 10}} />
+                <View style={{width: 150}}>
+                    <Button onPress={() => this.sendMessage('voip')} title='Send Voip'/>
+                </View>
+            </View>
+
+
+            <Text style={{paddingTop: 40}}>Incoming message: {lastMessage}</Text>
             </View>
             )
   }
 
-  sendMessage() {
+  sendMessage(topic) {
     const { destination, message } = this.state;
     if ( destination !== '' && message !== '' ) {
       const { pushSvc } = this.props.navigation.state.params;
@@ -78,6 +89,11 @@ export class MessagingScreen extends React.Component {
         sound: 'default',
         badge: 1
       };
+
+      if (topic) {
+          apns['topic'] = topic
+      }
+
       pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
 
       this.setState({message:'' })
