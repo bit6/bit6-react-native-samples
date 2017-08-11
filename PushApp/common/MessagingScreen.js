@@ -90,11 +90,14 @@ export class MessagingScreen extends React.Component {
         badge: 1
       };
 
+      //topic only applies to APNS
       if (topic) {
           apns['topic'] = topic
+          pushSvc.send( {to: destination, payload: {apns: apns}} );
       }
-
-      pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
+      else {
+        pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
+      }
 
       this.setState({message:'' })
     }
