@@ -31,6 +31,6 @@ Sample app for sending/receiving push notifications using Bit6 Push Service in R
 ### Run in iOS
 
 1. Open `/ios/PushApp.xcodeproj` in Xcode.
-2. Set the bundle identifier in your targets. It has to match the one from the APNS certificates.
+2. Set the bundle identifier in your targets. It has to match the one from the APNS certificate.
 3. Set a team for `PushApp ` and `PushAppTests` targets.
 4. Run the project.

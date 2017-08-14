@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, Button, Platform, Text } from 'react-native';
+import { AppState, View, TextInput, Button, Platform, Text } from 'react-native';
 import { AccessToken, Push } from 'bit6';
 
 import {NotificationsAndroid} from 'react-native-notifications';
@@ -17,10 +17,15 @@ export class LoginScreen extends React.Component {
 
     this.state = {
       processing : true,
-      apns_token_error : false
+      apns_token_error : false,
+      appState: AppState.currentState
     }
 
     this.registerForPushNotifications()
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
   }
 
   componentWillUnmount() {
@@ -29,7 +34,17 @@ export class LoginScreen extends React.Component {
         NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.oniOSPushRegistered.bind(this));
         NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.oniOSPushRegistrationFailed.bind(this));
         NotificationsIOS.removeEventListener('pushKitRegistered', this.oniOSPushKitRegistered.bind(this));
+
+        //on iOS we listen to events in AppState to be able to clear the notification badge when returning to the app
+        AppState.removeEventListener('change', this._handleAppStateChange);
     }
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+        NotificationsIOS.setBadgesCount(0);
+    }
+    this.setState({appState: nextAppState});
   }
 
   registerForPushNotifications() {

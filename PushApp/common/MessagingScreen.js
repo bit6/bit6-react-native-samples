@@ -32,19 +32,13 @@ export class MessagingScreen extends React.Component {
     const { pushSvc } = this.props.navigation.state.params;
 
     if (Platform.OS === 'ios') {
-        NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground.bind(this));
-        NotificationsIOS.addEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground.bind(this));
-        NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened.bind(this));
+        NotificationsIOS.addEventListener('notificationReceivedForeground', this.oniOSNotificationReceivedForeground.bind(this));
+        NotificationsIOS.addEventListener('notificationReceivedBackground', this.oniOSNotificationReceivedBackground.bind(this));
+        NotificationsIOS.addEventListener('notificationOpened', this.oniOSNotificationOpened.bind(this));
     }
     else {
-        NotificationsAndroid.setNotificationReceivedListener((notification) => {
-            this.setState({lastMessage:notification.getMessage()})
-            console.log("Notification received on device", notification.getData());
-        });
-        NotificationsAndroid.setNotificationOpenedListener((notification) => {
-            this.setState({lastMessage:notification.getMessage()})
-            console.log("Notification opened by device user", notification.getData());
-        });
+        NotificationsAndroid.setNotificationReceivedListener(this.onAndroidNotificationOpened.bind(this));
+        NotificationsAndroid.setNotificationOpenedListener(this.onAndroidNotificationReceived.bind(this));
     }
   }
 
@@ -79,15 +73,17 @@ export class MessagingScreen extends React.Component {
       // FCM payload
       var fcm = {
         data: {
-            title: "RN-Demo",
-            body: message
+          title: "RN-Demo",
+          body: message
         }
       };
       // APNS payload
       var apns = {
-        alert: message,
-        sound: 'default',
-        badge: 1
+          aps: {
+            alert: message,
+            sound: 'default',
+            badge: 1
+          }
       };
 
       //topic only applies to APNS
@@ -103,27 +99,37 @@ export class MessagingScreen extends React.Component {
     }
   }
 
-  onNotificationReceivedForeground(notification) {
+  oniOSNotificationReceivedForeground(notification) {
     this.setState({lastMessage:notification.getMessage()})
   	console.log("Notification Received - Foreground", notification);
   }
 
-  onNotificationReceivedBackground(notification) {
+  oniOSNotificationReceivedBackground(notification) {
     this.setState({lastMessage:notification.getMessage()})
   	console.log("Notification Received - Background", notification);
   }
 
-  onNotificationOpened(notification) {
+  oniOSNotificationOpened(notification) {
     this.setState({lastMessage:notification.getMessage()})
   	console.log("Notification opened by device user", notification);
+  }
+
+  onAndroidNotificationOpened(notification) {
+      this.setState({lastMessage:notification.getMessage()})
+      console.log("Notification opened by device user", notification.getData());
+  }
+
+  onAndroidNotificationReceived(notification) {
+      this.setState({lastMessage:notification.getMessage()})
+      console.log("Notification received on device", notification.getData());
   }
 
   componentWillUnmount() {
     // prevent memory leaks!
     if (Platform.OS === 'ios') {
-      	NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground.bind(this));
-      	NotificationsIOS.removeEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground.bind(this));
-      	NotificationsIOS.removeEventListener('notificationOpened', this.onNotificationOpened.bind(this));
+      	NotificationsIOS.removeEventListener('notificationReceivedForeground', this.oniOSNotificationReceivedForeground.bind(this));
+      	NotificationsIOS.removeEventListener('notificationReceivedBackground', this.oniOSNotificationReceivedBackground.bind(this));
+      	NotificationsIOS.removeEventListener('notificationOpened', this.oniOSNotificationOpened.bind(this));
     }
   }
 }
