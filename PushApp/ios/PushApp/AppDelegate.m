@@ -17,7 +17,7 @@
 
 @implementation AppDelegate
 
-+ (BOOL)isAppStoreEnvironment {
++ (BOOL)isSandboxApns {
 #if TARGET_IPHONE_SIMULATOR
   return NO;
 #else
@@ -34,13 +34,13 @@
     NSString *cleared = [[profile componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet] componentsJoinedByString:@""];
     isDevelopment = [cleared rangeOfString:@"<key>get-task-allow</key><true/>"].length > 0;
   }
-  return !isDevelopment;
+  return isDevelopment;
 #endif
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  NSDictionary *props = @{@"appstore" : @([AppDelegate isAppStoreEnvironment])};
+  NSDictionary *props = @{@"apnsSandbox" : @([AppDelegate isSandboxApns])};
 
   NSURL *jsCodeLocation;
 

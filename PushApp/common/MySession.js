@@ -1,34 +1,15 @@
 import { Platform, AsyncStorage } from 'react-native';
 
-export class Bit6Session {
+export class MySession {
 
-  static async login(identity, service, token, token_voip){
+  static async setIdentity(identity){
       try {
-        await AsyncStorage.setItem('@Bit6Session:identity', identity);
-        await AsyncStorage.setItem('@Bit6Session:service', service);
-
-        if (token) {
-            await AsyncStorage.setItem('@Bit6Session:token', token);
-        }
-        else {
-            await AsyncStorage.removeItem('@Bit6Session:token');
-        }
-
-        if (token_voip) {
-            await AsyncStorage.setItem('@Bit6Session:token_voip', token_voip);
-        }
-        else {
-            await AsyncStorage.removeItem('@Bit6Session:token_voip');
-        }
-      }
-      catch (error) {
-      // Error saving data
-      }
-  }
-
-  static async logout(){
-      try {
-        await AsyncStorage.removeItem('@Bit6Session:identity');
+         if (identity) {
+           await AsyncStorage.setItem('@Bit6Session:identity', identity);
+         }
+         else {
+           await AsyncStorage.removeItem('@Bit6Session:identity');
+         }
       }
       catch (error) {
       // Error saving data
@@ -66,6 +47,36 @@ export class Bit6Session {
       // Error saving data
       }
       return device
+  }
+
+  //TOKENS
+
+  static async setTokens(service, token, token_voip){
+      try {
+        if (service) {
+            await AsyncStorage.setItem('@Bit6Session:service', service);
+        }
+        else {
+            await AsyncStorage.removeItem('@Bit6Session:service');
+        }
+
+        if (token) {
+            await AsyncStorage.setItem('@Bit6Session:token', token);
+        }
+        else {
+            await AsyncStorage.removeItem('@Bit6Session:token');
+        }
+
+        if (token_voip) {
+            await AsyncStorage.setItem('@Bit6Session:token_voip', token_voip);
+        }
+        else {
+            await AsyncStorage.removeItem('@Bit6Session:token_voip');
+        }
+      }
+      catch (error) {
+      // Error saving data
+      }
   }
 
   static async getService(){

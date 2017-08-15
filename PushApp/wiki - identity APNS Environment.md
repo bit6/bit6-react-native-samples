@@ -7,7 +7,7 @@ This demo requires to identify the APNS environment in which the iOS app is runn
 Open your AppDelegate and add the following method:
 
 ```ObjC
-+ (BOOL)isAppStoreEnvironment {
++ (BOOL)isSandboxApns {
 #if TARGET_IPHONE_SIMULATOR
   return NO;
 #else
@@ -24,14 +24,14 @@ Open your AppDelegate and add the following method:
     NSString *cleared = [[profile componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet] componentsJoinedByString:@""];
     isDevelopment = [cleared rangeOfString:@"<key>get-task-allow</key><true/>"].length > 0;
   }
-  return !isDevelopment;
+  return isDevelopment;
 #endif
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     //add this
-    NSDictionary *props = @{@"appstore" : @([AppDelegate isAppStoreEnvironment])};
+    NSDictionary *props = @{@"apnsSandbox" : @([AppDelegate isSandboxApns])};
 
     //and replace initialProperties:nil with initialProperties:props
     RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
@@ -52,6 +52,7 @@ return <MyNavBar screenProps={this.props} />;
 ```
 
 and then in `LoginScreen` the property can be accessed in this way:
+
 ```js
-var service = this.props.screenProps.appstore ? 'apns' : 'apns-dev'
+var service = this.props.screenProps.apnsSandbox ? 'apns-dev' : 'apns'
 ```
