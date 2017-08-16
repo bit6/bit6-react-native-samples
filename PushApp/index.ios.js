@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppRegistry, Platform } from 'react-native';
+import { AppRegistry, Platform, AppState } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import NotificationsIOS from 'react-native-notifications';
@@ -20,7 +20,8 @@ class MyApp extends React.Component {
     super(props)
 
     this.state = {
-      service: (this.props.apnsSandbox ? 'apns-dev' : 'apns')
+      service: (this.props.apnsSandbox ? 'apns-dev' : 'apns'),
+      appState: AppState.currentState
     }
 
     this.onNotificationReceivedForeground = this.onNotificationReceivedForeground.bind(this)
@@ -39,6 +40,11 @@ class MyApp extends React.Component {
     NotificationsIOS.addEventListener('pushKitRegistered', this.onPushKitRegistered);
   }
 
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+    NotificationsIOS.setBadgesCount(0);
+  }
+
   componentWillUnmount() {
     // prevent memory leaks!
     NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground);
@@ -48,6 +54,9 @@ class MyApp extends React.Component {
     NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.onPushRegistered);
     NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
     NotificationsIOS.removeEventListener('pushKitRegistered', this.onPushKitRegistered);
+
+    //we listen to events in AppState to be able to clear the notification badge when returning to the app
+    AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
   render() {
@@ -66,6 +75,13 @@ class MyApp extends React.Component {
       screenProps['lastMessage'] = lastMessage
     }
     return <MyNavBar screenProps={screenProps} />;
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      NotificationsIOS.setBadgesCount(0);
+    }
+    this.setState({appState: nextAppState});
   }
 
   onPushRegistered(token) {
