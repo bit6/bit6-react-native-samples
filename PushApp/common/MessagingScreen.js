@@ -30,62 +30,29 @@ export class MessagingScreen extends React.Component {
     }
 
     if (Platform.OS === 'ios') {
-        this.oniOSNotificationReceivedForeground = this.oniOSNotificationReceivedForeground.bind(this)
-        this.oniOSNotificationReceivedBackground = this.oniOSNotificationReceivedBackground.bind(this)
-        this.oniOSNotificationOpened = this.oniOSNotificationOpened.bind(this)
-        this.oniOSPushRegistered = this.oniOSPushRegistered.bind(this)
-        this.oniOSPushRegistrationFailed = this.oniOSPushRegistrationFailed.bind(this)
-        this.oniOSPushKitRegistered = this.oniOSPushKitRegistered.bind(this)
-
-        NotificationsIOS.addEventListener('notificationReceivedForeground', this.oniOSNotificationReceivedForeground);
-        NotificationsIOS.addEventListener('notificationReceivedBackground', this.oniOSNotificationReceivedBackground);
-        NotificationsIOS.addEventListener('notificationOpened', this.oniOSNotificationOpened);
-
-        NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.oniOSPushRegistered);
-        NotificationsIOS.addEventListener('remoteNotificationsRegistrationFailed', this.oniOSPushRegistrationFailed);
-        NotificationsIOS.addEventListener('pushKitRegistered', this.oniOSPushKitRegistered);
-
         NotificationsIOS.requestPermissions();
         NotificationsIOS.consumeBackgroundQueue();
-
         NotificationsIOS.registerPushKit();
-    }
-    else {
-        this.onAndroidNotificationOpened = this.onAndroidNotificationOpened.bind(this)
-        this.onAndroidNotificationReceived = this.onAndroidNotificationReceived.bind(this)
-
-        NotificationsAndroid.setNotificationOpenedListener(this.onAndroidNotificationOpened);
-        NotificationsAndroid.setNotificationReceivedListener(this.onAndroidNotificationReceived);
     }
   }
 
   componentDidMount() {
       this.props.navigation.setParams({ unregisterDevice: this.unregisterDevice.bind(this) });
+  }
 
-      if (Platform.OS !== 'ios') {
-          this.onAndroidPushRegistered(this.props.screenProps.android_token)
+  componentWillReceiveProps(nextProps) {
+      const { service, token, token_voip } = nextProps.screenProps
+
+      //receiving push tokens
+      if (service) {
+          this.registerDevice(service, token, token_voip)
       }
   }
 
-  componentWillUnmount() {
-      // prevent memory leaks!
-      if (Platform.OS === 'ios') {
-          NotificationsIOS.removeEventListener('notificationReceivedForeground', this.oniOSNotificationReceivedForeground);
-          NotificationsIOS.removeEventListener('notificationReceivedBackground', this.oniOSNotificationReceivedBackground);
-          NotificationsIOS.removeEventListener('notificationOpened', this.oniOSNotificationOpened);
-
-          NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.oniOSPushRegistered);
-          NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.oniOSPushRegistrationFailed);
-          NotificationsIOS.removeEventListener('pushKitRegistered', this.oniOSPushKitRegistered);
-      }
-  }
-
-  async registerDevice() {
+  async registerDevice(service, token, token_voip) {
     var old_service = await MySession.getService()
     var old_token = await MySession.getToken()
     var old_token_voip = await MySession.getTokenVoIP()
-
-    const { service, token, token_voip } = this.state
 
     var postDevice = false
     if (Platform.OS === 'ios') {
@@ -121,7 +88,8 @@ export class MessagingScreen extends React.Component {
   }
 
   render() {
-    const { lastMessage, message, token, token_voip, bit6_error } = this.state;
+    const { message, bit6_error } = this.state
+    const { service, token, token_voip, lastMessage } = this.props.screenProps
     return (
             <View style={{padding: 10}}>
                 <TextInput style={{height: 40}} placeholder='Enter destination username' onChangeText={(destination) => this.setState({destination})} autoCapitalize='none'/>
@@ -140,8 +108,9 @@ export class MessagingScreen extends React.Component {
                 <Text style={{paddingTop: 40, paddingBottom: 40}}>Incoming message: {lastMessage}</Text>
 
                 <View>
+                    <Text style={{paddingBottom: 10}}>Service: {service ? service : 'fetching'}</Text>
                     <Text style={{paddingBottom: 10}}>Token: {token ? token : 'fetching'}</Text>
-                    <Text style={{paddingBottom: 10}}>VoIP Token: {token_voip ? token_voip : 'fetching'}</Text>
+                    <Text style={{paddingBottom: 10}}>{token_voip ? 'VoIP Token: '+token_voip : ''}</Text>
                     <Text>{bit6_error ? bit6_error : ''}</Text>
                 </View>
             </View>
@@ -180,62 +149,6 @@ export class MessagingScreen extends React.Component {
 
       this.setState({message:'' })
     }
-  }
-
-  // Notifications Handlers
-
-  oniOSPushRegistered(token) {
-    console.log("Device Token Received", token);
-
-    var service = this.props.screenProps.apnsSandbox ? 'apns-dev' : 'apns'
-    this.setState({service, token})
-
-    //if we have the voip token too we load the initial state
-    if ( this.state.token_voip ) {
-        this.registerDevice()
-    }
-  }
-
-  oniOSPushRegistrationFailed(error) {
-    console.log("Device Token Error", error);
-    this.setState({apns_token_error:true})
-  }
-
-  oniOSPushKitRegistered(token_voip) {
-    var service = this.props.screenProps.apnsSandbox ? 'apns-dev' : 'apns'
-    this.setState({service, token_voip})
-
-    //if we finished fetching the regular token too we load the initial state
-    if ( this.state.token || this.state.apns_token_error ) {
-        this.registerDevice()
-    }
-  }
-
-  oniOSNotificationReceivedForeground(notification) {
-    this.setState({lastMessage:notification.getMessage()})
-  }
-
-  oniOSNotificationReceivedBackground(notification) {
-    this.setState({lastMessage:notification.getMessage()})
-  }
-
-  oniOSNotificationOpened(notification) {
-    this.setState({lastMessage:notification.getMessage()})
-  }
-
-  onAndroidPushRegistered(token) {
-      console.log("Device Token Received", token);
-
-      this.setState({service: 'fcm', token, token_voip:'doesn\'t apply'});
-      this.registerDevice()
-  }
-
-  onAndroidNotificationOpened(notification) {
-      this.setState({lastMessage:notification.getMessage()})
-  }
-
-  onAndroidNotificationReceived(notification) {
-      this.setState({lastMessage:notification.getMessage()})
   }
 
 }
