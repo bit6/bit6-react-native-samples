@@ -43,8 +43,8 @@ export class MessagingScreen extends React.Component {
   componentWillReceiveProps(nextProps) {
       const { service, token, token_voip } = nextProps.screenProps
 
-      //receiving push tokens
-      if (service) {
+      //receiving push tokens for the first time
+      if (this.props.screenProps.service !== service) {
           this.registerDevice(service, token, token_voip)
       }
   }
