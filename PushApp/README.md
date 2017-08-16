@@ -31,7 +31,7 @@ Note: When running on iOS the user might disable permission for the regular push
 
 ### Run on iOS
 
-1. Open `/ios/PushApp.xcodeproj` in Xcode
+1. Open `./ios/PushApp.xcodeproj` in Xcode
 2. Set the bundle identifier in your targets. It has to match the one from the APNS certificate.
 3. Set the team for `PushApp` and `PushAppTests` targets.
 4. Run the project

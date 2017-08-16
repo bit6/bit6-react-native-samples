@@ -2,52 +2,52 @@ import React from 'react';
 import { AppRegistry, Platform } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
+import NotificationsIOS from 'react-native-notifications';
+
 import { LoginScreen } from './common/LoginScreen';
 import { MessagingScreen } from './common/MessagingScreen';
 
-import NotificationsIOS from 'react-native-notifications';
 
 const MyNavBar = StackNavigator({
-                                 Login: { screen: LoginScreen },
-                                 Messaging: { screen: MessagingScreen }
-                                 });
+  Login: { screen: LoginScreen },
+  Messaging: { screen: MessagingScreen }
+});
+
 
 class MyApp extends React.Component {
 
   constructor(props) {
-      super(props)
+    super(props)
 
-      this.state = {
-          service: (this.props.apnsSandbox ? 'apns-dev' : 'apns')
-      }
+    this.state = {
+      service: (this.props.apnsSandbox ? 'apns-dev' : 'apns')
+    }
 
-      this.onNotificationReceivedForeground = this.onNotificationReceivedForeground.bind(this)
-      this.onNotificationReceivedBackground = this.onNotificationReceivedBackground.bind(this)
-      this.onNotificationOpened = this.onNotificationOpened.bind(this)
-      this.onPushRegistered = this.onPushRegistered.bind(this)
-      this.onPushRegistrationFailed = this.onPushRegistrationFailed.bind(this)
-      this.onPushKitRegistered = this.onPushKitRegistered.bind(this)
+    this.onNotificationReceivedForeground = this.onNotificationReceivedForeground.bind(this)
+    this.onNotificationReceivedBackground = this.onNotificationReceivedBackground.bind(this)
+    this.onNotificationOpened = this.onNotificationOpened.bind(this)
+    this.onPushRegistered = this.onPushRegistered.bind(this)
+    this.onPushRegistrationFailed = this.onPushRegistrationFailed.bind(this)
+    this.onPushKitRegistered = this.onPushKitRegistered.bind(this)
 
-      NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground);
-      NotificationsIOS.addEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground);
-      NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened);
+    NotificationsIOS.addEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground);
+    NotificationsIOS.addEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground);
+    NotificationsIOS.addEventListener('notificationOpened', this.onNotificationOpened);
 
-      NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered);
-      NotificationsIOS.addEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
-      NotificationsIOS.addEventListener('pushKitRegistered', this.onPushKitRegistered);
+    NotificationsIOS.addEventListener('remoteNotificationsRegistered', this.onPushRegistered);
+    NotificationsIOS.addEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
+    NotificationsIOS.addEventListener('pushKitRegistered', this.onPushKitRegistered);
   }
 
   componentWillUnmount() {
-      // prevent memory leaks!
-      if (Platform.OS === 'ios') {
-          NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground);
-          NotificationsIOS.removeEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground);
-          NotificationsIOS.removeEventListener('notificationOpened', this.onNotificationOpened);
+    // prevent memory leaks!
+    NotificationsIOS.removeEventListener('notificationReceivedForeground', this.onNotificationReceivedForeground);
+    NotificationsIOS.removeEventListener('notificationReceivedBackground', this.onNotificationReceivedBackground);
+    NotificationsIOS.removeEventListener('notificationOpened', this.onNotificationOpened);
 
-          NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.onPushRegistered);
-          NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
-          NotificationsIOS.removeEventListener('pushKitRegistered', this.onPushKitRegistered);
-      }
+    NotificationsIOS.removeEventListener('remoteNotificationsRegistered', this.onPushRegistered);
+    NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
+    NotificationsIOS.removeEventListener('pushKitRegistered', this.onPushKitRegistered);
   }
 
   render() {
@@ -57,13 +57,13 @@ class MyApp extends React.Component {
 
     var screenProps = {}
     if (service && token_voip && (token || apns_token_error) ) {
-        screenProps['service'] = service
-        screenProps['token_voip'] = token_voip
-        screenProps['token'] = token
-        screenProps['apns_token_error'] = apns_token_error
+      screenProps['service'] = service
+      screenProps['token_voip'] = token_voip
+      screenProps['token'] = token
+      screenProps['apns_token_error'] = apns_token_error
     }
     if (lastMessage) {
-        screenProps['lastMessage'] = lastMessage
+      screenProps['lastMessage'] = lastMessage
     }
     return <MyNavBar screenProps={screenProps} />;
   }
