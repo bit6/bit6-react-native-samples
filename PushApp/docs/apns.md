@@ -1,12 +1,12 @@
-# PushApp
+## APNS environment
 
-This demo requires to identify the APNS environment in which the iOS app is running, if Sandbox or Production. Follow the next steps:
+To support push notifications for deployment from Xcode and TestFlight / App Store, the application needs to determine whether to use Production or Sandbox APNS connection. Follow these steps:
 
-##### step1. Get the APNS environment in your iOS code
+### 1. Add native helper method
 
-Open your AppDelegate and add the following method:
+Open your `AppDelegate` and add the following methods:
 
-```ObjC
+```objc
 + (BOOL)isSandboxApns {
 #if TARGET_IPHONE_SIMULATOR
   return NO;
@@ -30,22 +30,23 @@ Open your AppDelegate and add the following method:
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    //add this
+    // Add this line
     NSDictionary *props = @{@"apnsSandbox" : @([AppDelegate isSandboxApns])};
 
-    //and replace initialProperties:nil with initialProperties:props
+    // Replace initialProperties:nil with initialProperties:props
     RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
                                                         moduleName:@"PushApp"
-                                               initialProperties:props
-                                                        launchOptions:launchOptions];
+                                                 initialProperties:props
+                                                     launchOptions:launchOptions];
 }
 ```
 
-Now you will be able to access the props "appstore" inside the top Component in your ReactNative JS code.
+Now you will be able to access the prop `apnsSandbox` inside the top Component in your ReactNative JS code.
 
-##### step2. Access props.appstore in JS code
 
-See in `App.js` how to passed down the props to the StackNavigator
+### 2. Access props.apnsSandbox in JS code
+
+See in `App.js` for the example on how to pass the props to StackNavigator
 
 ```js
 return <MyNavBar screenProps={this.props} />;
