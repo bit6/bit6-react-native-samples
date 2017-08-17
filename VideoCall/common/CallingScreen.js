@@ -10,27 +10,25 @@ export class CallingScreen extends React.Component {
   constructor(props,context) {
     super(props,context);
 
-    this.state = {
-      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
-    }
+    this.signalSvc = new Signal(this.props.navigation.state.params.accessToken)
 
     this.onSession = this.onSession.bind(this)
     this.onParticipant = this.onParticipant.bind(this)
     this.handleVideoElemChange = this.handleVideoElemChange.bind(this)
     this.leaveSession = this.leaveSession.bind(this)
 
-    this.state.signalSvc.on('message', function(msg) {
+    this.signalSvc.on('message', function(msg) {
          console.log('Received direct signal', this);
     });
 
     // Init Video Service
-    var videoSvc = new Video(this.state.signalSvc);
-    videoSvc.on('session', this.onSession);
+    this.videoSvc = new Video(this.signalSvc);
+    this.videoSvc.on('session', this.onSession);
 
     // Get notified about video elements for local video feed
     // v - video element to add or remove
     // op - operation. 1 - add, 0 - update, -1 - remove
-    videoSvc.capture.on('video', function(v, op) {
+    this.videoSvc.capture.on('video', function(v, op) {
       console.log('Local video elem', op, v);
       this.handleVideoElemChange(v, null, null, op);
     }.bind(this));
@@ -38,7 +36,6 @@ export class CallingScreen extends React.Component {
     this.state = {
       session : null,
       sessionId : '',
-      videoSvc : videoSvc,
       remoteStream: null,
       localStream: null,
       participant: null,
@@ -93,16 +90,14 @@ export class CallingScreen extends React.Component {
   joinCall() {
     const { sessionId } = this.state;
     if ( sessionId !== '' ) {
-      this.state.videoSvc.join(sessionId, function(err, s) {
+      this.videoSvc.join(sessionId, function(err, s) {
         console.log('Session joined', err, s.id);
       });
     }
   }
 
   createCall() {
-    const { videoSvc } = this.state;
-
-    videoSvc.create({mode: 'p2p'}, function(err, s) {
+    this.videoSvc.create({mode: 'p2p'}, function(err, s) {
       console.log('Session created', err, s.id);
     });
   }

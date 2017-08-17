@@ -10,16 +10,17 @@ export class MessagingScreen extends React.Component {
   constructor(props,context) {
     super(props,context);
 
+    this.signalSvc = new Signal(this.props.navigation.state.params.accessToken)
+
     this.state = {
       destination : '',
       message : '',
       incomingMsgUser : '',
-      incomingMsg : '',
-      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
+      incomingMsg : ''
     }
 
     var screen = this
-    this.state.signalSvc.on('message', function(msg) {
+    this.signalSvc.on('message', function(msg) {
          console.log('Received direct signal', this);
          screen.setState({incomingMsgUser:msg.from.split('/')[0], incomingMsg:msg.text});
     });
@@ -41,7 +42,7 @@ export class MessagingScreen extends React.Component {
   sendMessage() {
     const { destination, message } = this.state;
     if ( destination !== '' && message !== '' ) {
-      this.state.signalSvc.send( {to: destination, text: message} );
+      this.signalSvc.send( {to: destination, text: message} );
       this.setState({message:'' })
     }
   }

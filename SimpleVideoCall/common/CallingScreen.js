@@ -10,19 +10,17 @@ export class CallingScreen extends React.Component {
   constructor(props,context) {
     super(props,context);
 
-    this.state = {
-      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
-    }
+    this.signalSvc = new Signal(this.props.navigation.state.params.accessToken)
 
     this.onSession = this.onSession.bind(this)
     this.handleVideoElemChange = this.handleVideoElemChange.bind(this)
     this.leaveSession = this.leaveSession.bind(this)
 
-    this.state.signalSvc.on('message', function(msg) {
+    this.signalSvc.on('message', function(msg) {
        // See the code in 'inviteButton' click handler about
        // this signal message payload
        var t = msg.type;
-       // Sender will contain a full addres of the other
+       // Sender will contain a full addressof the other
        // user's client connection: identity/device/route
        var sender = msg.from;
        var ident = sender.split('/')[0];
@@ -32,19 +30,19 @@ export class CallingScreen extends React.Component {
          // Automatically accepting - by joining the session
          // If we want to reject the invite, we could send another signal
          // back to the invitor
-         videoSvc.join(sessionId, function(err, s) {
+         this.videoSvc.join(sessionId, function(err, s) {
            // Publish all my media into the Session
            //s.me.publish({audio: true, video: true});
          });
        }
-    });
+    }.bind(this));
 
     // Init Video Service
-    var videoSvc = new Video(this.state.signalSvc);
-    videoSvc.on('session', this.onSession);
+    this.videoSvc = new Video(this.signalSvc);
+    this.videoSvc.on('session', this.onSession);
 
     // Local video feed element available
-    videoSvc.capture.on('video', function(v, op) {
+    this.videoSvc.capture.on('video', function(v, op) {
       console.log('Local video elem', op, v);
       this.handleVideoElemChange(v, null, null, op);
     }.bind(this));
@@ -52,7 +50,6 @@ export class CallingScreen extends React.Component {
     this.state = {
       to: '',
       session : null,
-      videoSvc : videoSvc,
       remoteStream: null,
       localStream: null,
       participant:null
@@ -92,22 +89,22 @@ export class CallingScreen extends React.Component {
   joinCall() {
     const { sessionId } = this.state;
     if ( sessionId !== '' ) {
-      this.state.videoSvc.join(sessionId, function(err, s) {
+      this.videoSvc.join(sessionId, function(err, s) {
         console.log('Session joined', err, s.id);
       });
     }
   }
 
   invite() {
-    const { videoSvc, to } = this.state;
+    const { to } = this.state;
     if ( to !== '' ) {
       console.log('Invite clicked', to);
-      videoSvc.create({mode: 'p2p'}, function(err, s) {
+      this.videoSvc.create({mode: 'p2p'}, function(err, s) {
         console.log('Created session', s.id);
         // Let's send its ID to the recipient so he/she can join
         // We invent our own signaling format.
 
-        this.state.signalSvc.send({to: to, type: 'invite', data: s.id});
+        this.signalSvc.send({to: to, type: 'invite', data: s.id});
       }.bind(this));
     }
   }

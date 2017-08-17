@@ -22,12 +22,13 @@ export class MessagingScreen extends React.Component {
   constructor(props,context) {
     super(props,context);
 
+    this.pushSvc = new Push(this.props.navigation.state.params.accessToken)
+
     this.state = {
       destination : '',
       message : '',
       lastMessage : '---',
-      apns_token_error : false,
-      pushSvc : new Push(this.props.navigation.state.params.accessToken)
+      apns_token_error : false
     }
 
     if (Platform.OS === 'ios') {
@@ -70,7 +71,7 @@ export class MessagingScreen extends React.Component {
     // Register push token
     if (postDevice) {
       var params = Platform.OS === 'ios' ? {service, token, token_voip} : {service, token}
-      this.state.pushSvc.register(params, function(err, d) {
+      this.pushSvc.register(params, function(err, d) {
           console.log('Got device ', d, err);
           if ( err.info ) {
             this.setState({bit6_error:JSON.parse(err.info).message})
@@ -83,7 +84,7 @@ export class MessagingScreen extends React.Component {
   }
 
   unregisterDevice(){
-    this.state.pushSvc.unregister()
+    this.pushSvc.unregister()
     MySession.setTokens(null, null, null)
     MySession.setIdentity(null)
   }
@@ -121,7 +122,6 @@ export class MessagingScreen extends React.Component {
   sendMessage(topic) {
     const { destination, message } = this.state;
     if ( destination !== '' && message !== '' ) {
-      const { pushSvc } = this.state;
 
       // FCM payload
       var fcm = {
@@ -142,10 +142,10 @@ export class MessagingScreen extends React.Component {
       // Topic only applies to APNS
       if (topic) {
         apns.topic = topic
-        pushSvc.send( {to: destination, payload: {apns: apns}} );
+        this.pushSvc.send( {to: destination, payload: {apns: apns}} );
       }
       else {
-        pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
+        this.pushSvc.send( {to: destination, payload: {fcm: fcm, apns: apns}} );
       }
 
       this.setState({message:'' })
