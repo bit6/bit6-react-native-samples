@@ -4,7 +4,7 @@ import { Signal } from 'bit6';
 
 export class MessagingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-                                                  title: `Logged as ${navigation.state.params.user}`,
+                                                  title: `Logged as ${navigation.state.params.accessToken.identity}/${navigation.state.params.accessToken.device}`,
                                                   });
 
   constructor(props,context) {
@@ -15,11 +15,11 @@ export class MessagingScreen extends React.Component {
       message : '',
       incomingMsgUser : '',
       incomingMsg : '',
+      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
     }
 
     var screen = this
-    const { signalSvc } = this.props.navigation.state.params;
-    signalSvc.on('message', function(msg) {
+    this.state.signalSvc.on('message', function(msg) {
          console.log('Received direct signal', this);
          screen.setState({incomingMsgUser:msg.from.split('/')[0], incomingMsg:msg.text});
     });
@@ -41,8 +41,7 @@ export class MessagingScreen extends React.Component {
   sendMessage() {
     const { destination, message } = this.state;
     if ( destination !== '' && message !== '' ) {
-      const { signalSvc } = this.props.navigation.state.params;
-      signalSvc.send( {to: destination, text: message} );
+      this.state.signalSvc.send( {to: destination, text: message} );
       this.setState({message:'' })
     }
   }

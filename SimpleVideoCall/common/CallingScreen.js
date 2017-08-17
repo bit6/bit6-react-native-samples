@@ -4,18 +4,21 @@ import { Signal, Video } from 'bit6';
 
 export class CallingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-                                                  title: `Logged as ${navigation.state.params.user}`,
+                                                  title: `Logged as ${navigation.state.params.accessToken.identity}/${navigation.state.params.accessToken.device}`,
                                                   });
 
   constructor(props,context) {
     super(props,context);
 
+    this.state = {
+      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
+    }
+
     this.onSession = this.onSession.bind(this)
     this.handleVideoElemChange = this.handleVideoElemChange.bind(this)
     this.leaveSession = this.leaveSession.bind(this)
 
-    const { signalSvc } = this.props.navigation.state.params;
-    signalSvc.on('message', function(msg) {
+    this.state.signalSvc.on('message', function(msg) {
        // See the code in 'inviteButton' click handler about
        // this signal message payload
        var t = msg.type;
@@ -37,7 +40,7 @@ export class CallingScreen extends React.Component {
     });
 
     // Init Video Service
-    var videoSvc = new Video(signalSvc);
+    var videoSvc = new Video(this.state.signalSvc);
     videoSvc.on('session', this.onSession);
 
     // Local video feed element available
@@ -104,8 +107,7 @@ export class CallingScreen extends React.Component {
         // Let's send its ID to the recipient so he/she can join
         // We invent our own signaling format.
 
-        const { signalSvc } = this.props.navigation.state.params;
-        signalSvc.send({to: to, type: 'invite', data: s.id});
+        this.state.signalSvc.send({to: to, type: 'invite', data: s.id});
       }.bind(this));
     }
   }

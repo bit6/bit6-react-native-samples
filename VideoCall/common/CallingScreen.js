@@ -4,24 +4,27 @@ import { Signal, Video } from 'bit6';
 
 export class CallingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
-                                                  title: `Logged as ${navigation.state.params.user}`,
+                                                  title: `Logged as ${navigation.state.params.accessToken.identity}/${navigation.state.params.accessToken.device}`,
                                                   });
 
   constructor(props,context) {
     super(props,context);
+
+    this.state = {
+      signalSvc: new Signal(this.props.navigation.state.params.accessToken)
+    }
 
     this.onSession = this.onSession.bind(this)
     this.onParticipant = this.onParticipant.bind(this)
     this.handleVideoElemChange = this.handleVideoElemChange.bind(this)
     this.leaveSession = this.leaveSession.bind(this)
 
-    const { signalSvc } = this.props.navigation.state.params;
-    signalSvc.on('message', function(msg) {
+    this.state.signalSvc.on('message', function(msg) {
          console.log('Received direct signal', this);
     });
 
     // Init Video Service
-    var videoSvc = new Video(signalSvc);
+    var videoSvc = new Video(this.state.signalSvc);
     videoSvc.on('session', this.onSession);
 
     // Get notified about video elements for local video feed

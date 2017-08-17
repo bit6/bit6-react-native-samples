@@ -41,7 +41,9 @@ class MyApp extends React.Component {
   }
 
   componentDidMount() {
+    //we listen to events in AppState to be able to clear the notification badge when returning to the app
     AppState.addEventListener('change', this._handleAppStateChange);
+
     NotificationsIOS.setBadgesCount(0);
   }
 
@@ -55,7 +57,6 @@ class MyApp extends React.Component {
     NotificationsIOS.removeEventListener('remoteNotificationsRegistrationFailed', this.onPushRegistrationFailed);
     NotificationsIOS.removeEventListener('pushKitRegistered', this.onPushKitRegistered);
 
-    //we listen to events in AppState to be able to clear the notification badge when returning to the app
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 

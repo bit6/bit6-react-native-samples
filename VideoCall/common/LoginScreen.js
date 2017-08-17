@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TextInput, Button, Platform } from 'react-native';
-import { AccessToken, Signal } from 'bit6';
+import { AccessToken } from 'bit6';
 
 export class LoginScreen extends React.Component {
   static navigationOptions = {
@@ -13,7 +13,7 @@ export class LoginScreen extends React.Component {
     this.state = {
       device: (Platform.OS === 'ios' ? 'ios' : 'and') + Math.floor((Math.random() * 1000) + 1),
       username : '',
-      loging : false
+      processing : false
     }
   }
 
@@ -21,16 +21,16 @@ export class LoginScreen extends React.Component {
     return (
             <View style={{padding: 10}}>
             <TextInput style={{height: 40}} placeholder='Enter your username' onChangeText={(username) => this.setState({username})} autoCapitalize='none'/>
-            <Button onPress={() => this.generateJWT((jwt) => this.login(jwt))} title='Login' disabled={this.state.loging}/>
+            <Button onPress={() => this.fetchToken((jwt) => this.login(jwt))} title='Login' disabled={this.state.processing}/>
             </View>
             )
   }
 
-  generateJWT(handler) {
+  fetchToken(handler) {
     const { username, device } = this.state
 
     if (username !== '') {
-      this.setState({loging:true})
+      this.setState({processing:true})
       fetch('https://bit6-demo-token-svc.herokuapp.com/token', {
             method: 'POST',
             headers: {
@@ -45,11 +45,10 @@ export class LoginScreen extends React.Component {
       .then((response) => response.json())
       .then((responseJson) => {
             handler(responseJson.token);
-            this.setState({loging:false})
             })
       .catch((error) => {
              console.error(error);
-             this.setState({loging:false})
+             this.setState({processing:false})
              });
     }
   }
@@ -58,15 +57,12 @@ export class LoginScreen extends React.Component {
     var accessToken = new AccessToken(jwt);
     accessToken.on('expired', function(t) {
        console.log('AccessToken expired, need to renew', t);
-       this.generateJWT((jwt) => accessToken.update(jwt))
+       this.fetchToken((jwt) =>
+           accessToken.update(jwt))
     });
 
-    var signalSvc = new Signal(accessToken);
-
-    const { navigate } = this.props.navigation;
-    const { username, device } = this.state;
-    
-    navigate('Messaging', { user: username + '/' + device, signalSvc })
+    this.props.navigation.navigate('Calling', { accessToken })
+    this.setState({processing:false})
   }
 
 }
