@@ -63,7 +63,12 @@
 // Required to register for notifications
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
 {
-  [RNNotifications didRegisterUserNotificationSettings:notificationSettings];
+  if (notificationSettings.types == UIUserNotificationTypeNone) {
+    [RNNotifications didFailToRegisterForRemoteNotificationsWithError:[NSError errorWithDomain:NSURLErrorDomain code:-1 userInfo:@{NSLocalizedDescriptionKey:@"Push Notifications disabled"}]];
+  }
+  else {
+    [RNNotifications didRegisterUserNotificationSettings:notificationSettings];
+  }
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
