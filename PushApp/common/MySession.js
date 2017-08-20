@@ -49,29 +49,15 @@ export class MySession {
       return device
   }
 
-  //TOKENS
+  //PUSH INFO
 
-  static async setTokens(service, token, token_voip){
+  static async setPushInfo(pushInfo){
       try {
-        if (service) {
-            await AsyncStorage.setItem('@Bit6Session:service', service);
+        if (pushInfo) {
+            await AsyncStorage.setItem('@Bit6Session:pushInfo', JSON.stringify(pushInfo));
         }
         else {
-            await AsyncStorage.removeItem('@Bit6Session:service');
-        }
-
-        if (token) {
-            await AsyncStorage.setItem('@Bit6Session:token', token);
-        }
-        else {
-            await AsyncStorage.removeItem('@Bit6Session:token');
-        }
-
-        if (token_voip) {
-            await AsyncStorage.setItem('@Bit6Session:token_voip', token_voip);
-        }
-        else {
-            await AsyncStorage.removeItem('@Bit6Session:token_voip');
+            await AsyncStorage.removeItem('@Bit6Session:pushInfo');
         }
       }
       catch (error) {
@@ -79,35 +65,11 @@ export class MySession {
       }
   }
 
-  static async getService(){
+  static async getPushInfo(){
       try {
-        const value = await AsyncStorage.getItem('@Bit6Session:service');
+        const value = await AsyncStorage.getItem('@Bit6Session:pushInfo');
         if (value){
-          return value
-        }
-      } catch (error) {
-        // Error retrieving data
-      }
-      return null
-  }
-
-  static async getToken(){
-      try {
-        const value = await AsyncStorage.getItem('@Bit6Session:token');
-        if (value){
-          return value
-        }
-      } catch (error) {
-        // Error retrieving data
-      }
-      return null
-  }
-
-  static async getTokenVoIP(){
-      try {
-        const value = await AsyncStorage.getItem('@Bit6Session:token_voip');
-        if (value){
-          return value
+          return JSON.parse(value)
         }
       } catch (error) {
         // Error retrieving data

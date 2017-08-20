@@ -26,9 +26,7 @@ export class MessagingScreen extends React.Component {
 
     this.state = {
       destination : '',
-      message : '',
-      lastMessage : '---',
-      apns_token_error : false
+      message : ''
     }
 
     if (Platform.OS === 'ios') {
@@ -40,58 +38,54 @@ export class MessagingScreen extends React.Component {
 
   componentDidMount() {
     this.props.navigation.setParams({ unregisterDevice: this.unregisterDevice.bind(this) });
+
+    //already received push tokens
+    if (this.props.screenProps.pushInfo) {
+        this.registerDevice(this.props.screenProps.pushInfo)
+    }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { service, token, token_voip } = nextProps.screenProps
-
     //receiving push tokens for the first time
-    if (this.props.screenProps.service !== service) {
-        this.registerDevice(service, token, token_voip)
+    if (this.props.screenProps.pushInfo !== nextProps.screenProps.pushInfo) {
+        this.registerDevice(nextProps.screenProps.pushInfo)
     }
   }
 
-  async registerDevice(service, token, token_voip) {
-    var old_service = await MySession.getService()
-    var old_token = await MySession.getToken()
-    var old_token_voip = await MySession.getTokenVoIP()
-
-    var postDevice = false
-    if (Platform.OS === 'ios') {
-        if (old_service !== service || old_token !== token || old_token_voip !== token_voip) {
-          postDevice = true
-        }
-    }
-    else {
-      if (old_service !== service || old_token !== token) {
-        postDevice = true
-      }
-    }
+  async registerDevice(pushInfo) {
+    if (this.doingLogout) { return }
+    var old_pushInfo = await MySession.getPushInfo()
 
     // Register push token
-    if (postDevice) {
-      var params = Platform.OS === 'ios' ? {service, token, token_voip} : {service, token}
-      this.pushSvc.register(params, function(err, d) {
+    if ( old_pushInfo !== pushInfo ) {
+      this.pushSvc.register(pushInfo, function(err, d) {
           console.log('Got device ', d, err);
           if ( err.info ) {
             this.setState({bit6_error:JSON.parse(err.info).message})
           }
           else {
-            MySession.setTokens(service, token, token_voip)
+            MySession.setPushInfo(pushInfo)
           }
       }.bind(this));
     }
   }
 
   unregisterDevice(){
+    this.doingLogout = true
     this.pushSvc.unregister()
-    MySession.setTokens(null, null, null)
+    MySession.setPushInfo(null)
     MySession.setIdentity(null)
+    this.props.screenProps.clearMessage()
   }
 
   render() {
     const { message, bit6_error } = this.state
-    const { service, token, token_voip, lastMessage } = this.props.screenProps
+    const { pushInfo, apns_token_error, lastMessage } = this.props.screenProps
+
+    const service     = pushInfo ? pushInfo.service : 'fetching'
+    const token       = pushInfo ? (pushInfo.token      || apns_token_error.localizedDescription) : 'fetching'
+    const token_voip  = pushInfo ? (pushInfo.token_voip || 'doesn\'t apply') : 'fetching'
+
     return (
       <View style={{padding: 10}}>
           <TextInput style={{height: 40}} placeholder='Enter destination username' onChangeText={(destination) => this.setState({destination})} autoCapitalize='none'/>
@@ -110,9 +104,9 @@ export class MessagingScreen extends React.Component {
           <Text style={{paddingTop: 40, paddingBottom: 40}}>Incoming message: {lastMessage}</Text>
 
           <View>
-              <Text style={{paddingBottom: 10}}>Service: {service ? service : 'fetching'}</Text>
-              <Text style={{paddingBottom: 10}}>Token: {token ? token : 'fetching'}</Text>
-              <Text style={{paddingBottom: 10}}>{token_voip ? 'VoIP Token: '+token_voip : ''}</Text>
+              <Text style={{paddingBottom: 10}}>Service: {service}</Text>
+              <Text style={{paddingBottom: 10}}>Token: {token}</Text>
+              <Text style={{paddingBottom: 10}}>VoIP Token: {token_voip}</Text>
               <Text>{bit6_error ? bit6_error : ''}</Text>
           </View>
       </View>

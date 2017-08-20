@@ -21,6 +21,7 @@ class MyApp extends React.Component {
 
     this.state = {
       service: (this.props.apnsSandbox ? 'apns-dev' : 'apns'),
+      lastMessage: '',
       appState: AppState.currentState
     }
 
@@ -65,17 +66,22 @@ class MyApp extends React.Component {
 
     const { service, token, token_voip, apns_token_error, lastMessage } = this.state
 
-    var screenProps = {}
-    if (service && token_voip && (token || apns_token_error) ) {
-      screenProps['service'] = service
-      screenProps['token_voip'] = token_voip
-      screenProps['token'] = token
-      screenProps['apns_token_error'] = apns_token_error
-    }
-    if (lastMessage) {
+    var screenProps = {clearMessage:this.clearMessage.bind(this)}
+    if (token_voip) {
+      if (token) {
+        screenProps['pushInfo'] = {service, token, token_voip}
+      }
+      else if (apns_token_error) {
+        screenProps['pushInfo'] = {service, token_voip}
+        screenProps['apns_token_error'] = apns_token_error
+      }
       screenProps['lastMessage'] = lastMessage
     }
     return <MyNavBar screenProps={screenProps} />;
+  }
+
+  clearMessage = () => {
+    this.setState({lastMessage:''})
   }
 
   _handleAppStateChange = (nextAppState) => {
@@ -90,9 +96,9 @@ class MyApp extends React.Component {
     this.setState({token})
   }
 
-  onPushRegistrationFailed(error) {
-    console.log("Device Token Error", error);
-    this.setState({apns_token_error:true})
+  onPushRegistrationFailed(apns_token_error) {
+    console.log("Device Token Error", apns_token_error);
+    this.setState({apns_token_error})
   }
 
   onPushKitRegistered(token_voip) {

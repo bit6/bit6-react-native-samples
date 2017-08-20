@@ -20,7 +20,8 @@ class MyApp extends React.Component {
     super(props)
 
     this.state = {
-      service: 'fcm'
+      service: 'fcm',
+      lastMessage: ''
     }
 
     NotificationsAndroid.setRegistrationTokenUpdateListener( this.onPushRegistered.bind(this) );
@@ -33,15 +34,16 @@ class MyApp extends React.Component {
 
     const { service, token, lastMessage } = this.state
 
-    var screenProps = {}
-    if (service && token) {
-      screenProps['service'] = service
-      screenProps['token'] = token
-    }
-    if (lastMessage) {
+    var screenProps = {clearMessage:this.clearMessage.bind(this)}
+    if (token) {
+      screenProps['pushInfo'] = {service, token}
       screenProps['lastMessage'] = lastMessage
     }
     return <MyNavBar screenProps={screenProps} />;
+  }
+
+  clearMessage = () => {
+    this.setState({lastMessage:''})
   }
 
   onPushRegistered(token) {
