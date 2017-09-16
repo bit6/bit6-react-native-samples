@@ -20,7 +20,7 @@ export class LoginScreen extends React.Component {
   render() {
     return (
             <View style={{padding: 10}}>
-            <TextInput style={{height: 40}} placeholder='Enter your username' onChangeText={(username) => this.setState({username})} autoCapitalize='none'/>
+            <TextInput style={{height: 40}} placeholder='Enter your username' onChangeText={(username) => this.setState({username})} autoCapitalize='none' value={this.state.username}/>
             <Button onPress={() => this.fetchToken((jwt) => this.login(jwt))} title='Login' disabled={this.state.processing}/>
             </View>
             )
