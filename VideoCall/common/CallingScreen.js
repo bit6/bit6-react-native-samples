@@ -103,9 +103,13 @@ export class CallingScreen extends React.Component {
   }
 
   switchCamera() {
-    let pc = this.state.participant.rtc.pc
-    let videotrack = pc.getLocalStreams()[0].getVideoTracks()[0]
-    videotrack._switchCamera()
+    const localStream = this.videoSvc.capture.localStream
+    if (localStream) {
+        const videoTracks = localStream.getVideoTracks()
+        if (videoTracks.length === 1) {
+            videoTracks[0]._switchCamera()
+        }
+    }
   }
 
   onSession(s, op) {

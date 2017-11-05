@@ -2,6 +2,8 @@ import React from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { Signal, Video } from 'bit6';
 
+import InCallManager from 'react-native-incall-manager';
+
 export class CallingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
                                                   title: `Logged as ${navigation.state.params.accessToken.identity}/${navigation.state.params.accessToken.device}`,
@@ -110,9 +112,13 @@ export class CallingScreen extends React.Component {
   }
 
   switchCamera() {
-    let pc = this.state.participant.rtc.pc
-    let videotrack = pc.getLocalStreams()[0].getVideoTracks()[0]
-    videotrack._switchCamera()
+    const localStream = this.videoSvc.capture.localStream
+    if (localStream) {
+      const videoTracks = localStream.getVideoTracks()
+      if (videoTracks.length === 1) {
+          videoTracks[0]._switchCamera()
+      }
+    }
   }
 
   onSession(session, op) {
@@ -128,6 +134,8 @@ export class CallingScreen extends React.Component {
                this.setState({participant:p})
                // Subscribe to all media published by this remote Participant
                p.subscribe({ audio: true, video: true });
+                   
+               InCallManager.start({media: 'video'});
              }
              // Participant has left
              else if (op < 0) {
@@ -154,6 +162,9 @@ export class CallingScreen extends React.Component {
 
   leaveSession() {
     this.state.session.leave()
+      
+    InCallManager.setKeepScreenOn(false)
+    InCallManager.stop();
   }
 
   // v.srcObject - stream to add or remove

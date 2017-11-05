@@ -2,7 +2,6 @@ import React from 'react';
 import { View, TextInput, Button, Platform, Text } from 'react-native';
 import { Push } from 'bit6';
 
-import {NotificationsAndroid} from 'react-native-notifications';
 import NotificationsIOS from 'react-native-notifications';
 
 import { MySession } from './MySession';

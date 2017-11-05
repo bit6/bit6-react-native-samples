@@ -36,6 +36,8 @@
 		2DCD954D1E0B4F2C00145EB5 /* SimpleVideoCallTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* SimpleVideoCallTests.m */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		D818D2281FAF53F500CBFF7C /* RNInCallManagerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = D818D2251FAF53F500CBFF7C /* RNInCallManagerBridge.m */; };
+		D818D2291FAF53F500CBFF7C /* RNInCallManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D818D2271FAF53F500CBFF7C /* RNInCallManager.swift */; };
 		D8C2085F1F05A7EC004DC9C6 /* libRCTWebRTC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D897499B1F05A7570026BB5A /* libRCTWebRTC.a */; };
 		D8C2086F1F05A920004DC9C6 /* WebRTC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8C208611F05A81A004DC9C6 /* WebRTC.framework */; };
 		D8C208701F05A920004DC9C6 /* WebRTC.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D8C208611F05A81A004DC9C6 /* WebRTC.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -294,6 +296,9 @@
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		A4B329CA08404DA194EDD488 /* RCTWebRTC.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTWebRTC.xcodeproj; path = "../node_modules/react-native-webrtc/ios/RCTWebRTC.xcodeproj"; sourceTree = "<group>"; };
+		D818D2251FAF53F500CBFF7C /* RNInCallManagerBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNInCallManagerBridge.m; sourceTree = "<group>"; };
+		D818D2261FAF53F500CBFF7C /* RNInCallManager-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RNInCallManager-Bridging-Header.h"; sourceTree = "<group>"; };
+		D818D2271FAF53F500CBFF7C /* RNInCallManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNInCallManager.swift; sourceTree = "<group>"; };
 		D8C208611F05A81A004DC9C6 /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = "../node_modules/react-native-webrtc/ios/WebRTC.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -480,6 +485,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				D818D2241FAF53F500CBFF7C /* RNInCallManager */,
 				5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
@@ -527,6 +533,17 @@
 				2D02E4901E0B4A5D006451C7 /* SimpleVideoCall-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D818D2241FAF53F500CBFF7C /* RNInCallManager */ = {
+			isa = PBXGroup;
+			children = (
+				D818D2251FAF53F500CBFF7C /* RNInCallManagerBridge.m */,
+				D818D2261FAF53F500CBFF7C /* RNInCallManager-Bridging-Header.h */,
+				D818D2271FAF53F500CBFF7C /* RNInCallManager.swift */,
+			);
+			name = RNInCallManager;
+			path = "../node_modules/react-native-incall-manager/ios/RNInCallManager";
 			sourceTree = "<group>";
 		};
 		D89749881F05A7560026BB5A /* Products */ = {
@@ -994,6 +1011,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				D818D2281FAF53F500CBFF7C /* RNInCallManagerBridge.m in Sources */,
+				D818D2291FAF53F500CBFF7C /* RNInCallManager.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1046,6 +1065,7 @@
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1075,6 +1095,7 @@
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = "";
@@ -1119,6 +1140,8 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = SimpleVideoCall;
+				SWIFT_OBJC_BRIDGING_HEADER = "../node_modules/react-native-incall-manager/ios/RNInCallManager/RNInCallManager-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -1143,6 +1166,8 @@
 					"-lc++",
 				);
 				PRODUCT_NAME = SimpleVideoCall;
+				SWIFT_OBJC_BRIDGING_HEADER = "../node_modules/react-native-incall-manager/ios/RNInCallManager/RNInCallManager-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
