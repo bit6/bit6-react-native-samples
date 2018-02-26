@@ -7,11 +7,11 @@
     "test": "jest"
   },
   "dependencies": {
-    "bit6": "^2.0.0-beta.6",
+    "bit6": "^2.0.0-beta.9",
     "react": "16.0.0-alpha.12",
     "react-native": "0.45.1",
     "react-native-webrtc": "^1.58.1",
-    "react-navigation": "^1.0.0-beta.11"
+    "react-navigation": "^1.0.0-beta.21"
   },
   "devDependencies": {
     "babel-jest": "20.0.3",
