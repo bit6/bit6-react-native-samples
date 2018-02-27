@@ -24,3 +24,5 @@ Sample app for Bit6 video sessions in React Native with customizable publishing/
 1. Open `/ios/VideoCall.xcodeproj` in Xcode.
 2. Set a team for `VideoCall` and `VideoCallTests` targets.
 3. Run the project.
+
+	Note. you might get the error: `'WebRTC/RTCMTLVideoView.h' file not found`. In this case just comment this line:`#import <WebRTC/RTCMTLVideoView.h>` in `WebRTC.h` file.

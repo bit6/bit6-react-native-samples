@@ -11,7 +11,7 @@
 		"react": "16.0.0-alpha.12",
 		"react-native": "0.45.1",
 		"react-native-incall-manager": "^2.2.0",
-		"react-native-webrtc": "^1.58.2",
+		"react-native-webrtc": "github:jitsi/react-native-webrtc#806435b41fa152a8239ebeb7d002d1c6e979be86",
 		"react-navigation": "^1.0.0-beta.21"
 	},
 	"devDependencies": {
