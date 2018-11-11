@@ -2,6 +2,8 @@ import React from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { Signal, Video } from 'bit6';
 
+import InCallManager from 'react-native-incall-manager';
+
 export class CallingScreen extends React.Component {
   static navigationOptions = ({ navigation }) => ({
                                                   title: `Logged as ${navigation.state.params.accessToken.identity}/${navigation.state.params.accessToken.device}`,
@@ -113,26 +115,32 @@ export class CallingScreen extends React.Component {
   }
 
   onSession(s, op) {
-      console.log('Video Session', op, s);
-      if ( op > 0 ) {
-        this.setState({sessionId:s.id, session:s})
+    console.log('Video Session', op, s);
+    if (op > 0) {
+      this.setState({ sessionId: s.id, session: s })
 
-        s.on('participant', this.onParticipant);
+      s.on('participant', this.onParticipant);
 
-        // Get notified about new video elements for remote video feeds.
-        // v - video element to add or remove
-        // p - participant
-        // op - operation. 1 - add, 0 - update, -1 - remove
-        s.on('video', function(v, p, op) {
-          this.handleVideoElemChange(v, s, p, op);
-        }.bind(this));
+      // Get notified about new video elements for remote video feeds.
+      // v - video element to add or remove
+      // p - participant
+      // op - operation. 1 - add, 0 - update, -1 - remove
+      s.on('video', function(v, p, op) {
+        this.handleVideoElemChange(v, s, p, op);
+      }.bind(this));
 
-        var media = { audio: true, video: true } ;
-        s.me.publish(media);
-      }
-      else if ( op < 0 ) {
-        this.setState({session:null,remoteStream:null,localStream:null,participant:null,publishing:{ audio: true, video: true },subscribedTo:{ audio: true, video: true }})
-      }
+      var media = { audio: true, video: true };
+      s.me.publish(media);
+
+      InCallManager.setKeepScreenOn(true)
+      InCallManager.start({ media: 'video' });
+    }
+    else if (op < 0) {
+      this.setState({ session: null, remoteStream: null, localStream: null, participant: null, publishing: { audio: true, video: true }, subscribedTo: { audio: true, video: true } })
+
+      InCallManager.setKeepScreenOn(false)
+      InCallManager.stop();
+    }
   }
 
   leaveSession() {
